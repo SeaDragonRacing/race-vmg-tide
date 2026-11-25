@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Race VMG Tide</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 12px;
+      font-family: Arial, sans-serif;
+      background: #07141f;
+      color: white;
+    }
+
+    h1 {
+      margin: 0 0 3px;
+      color: #5ed7ff;
+      font-size: 27px;
+    }
+
+    .subtitle {
+      margin: 0 0 12px;
+      color: #b8cbd4;
+      font-size: 14px;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 4px;
+      font-weight: bold;
+    }
+
+    select,
+    button {
+      width: 100%;
+      min-height: 46px;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 17px;
+    }
+
+    select {
+      background: white;
+      color: black;
+    }
+
+    button {
+      margin-top: 9px;
+      border: none;
+      background: #087da8;
+      color: white;
+      font-weight: bold;
+    }
+
+    button:disabled {
+      background: #53636b;
+      color: #bac4c8;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .panel {
+      margin-top: 11px;
+      padding: 12px;
+      border: 1px solid #376071;
+      border-radius: 10px;
+      background: #102633;
+    }
+
+    .mark-name {
+      margin: 0;
+      font-size: 19px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .rounding-side {
+      display: none;
+      margin: 9px 0 0;
+      padding: 9px;
+      border-radius: 7px;
+      background: #ffd166;
+      color: #16232a;
+      font-size: 23px;
+      font-weight: bold;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .course-note {
+      display: none;
+      margin: 8px 0 0;
+      color: #ffd166;
+      font-size: 14px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .vmg-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .vmg-box {
+      padding: 10px 5px;
+      border-radius: 8px;
+      background: #071b27;
+      text-align: center;
+    }
+
+    .vmg-label {
+      color: #b8eaff;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .vmg-value {
+      margin: 4px 0;
+      color: #77ffac;
+      font-size: 38px;
+      line-height: 1.05;
+      font-weight: bold;
+    }
+
+    .vmg-unit {
+      color: #c6d7de;
+      font-size: 13px;
+    }
+
+    .data-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px 15px;
+    }
+
+    .data-item {
+      padding: 5px 0;
+      border-bottom: 1px solid #274553;
+    }
+
+    .data-label {
+      display: block;
+      color: #c6d7de;
+      font-size: 12px;
+    }
+
+    .data-value {
+      display: block;
+      margin-top: 2px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    #vmgMessage,
+    #sampleStatus {
+      margin: 7px 0 0;
+      text-align: center;
+    }
+
+    #vmgMessage {
+      color: #d6e3e8;
+      font-size: 14px;
+    }
+
+    #sampleStatus {
+      color: #8db2c2;
+      font-size: 12px;
+    }
+
+    .positive {
+      color: #77ffac;
+    }
+
+    .negative {
+      color: #ff7373;
+    }
+
+    .warning {
+      color: #ffd166;
+    }
+
+    /* ---------- Map view ---------- */
+
+    .hidden {
+      display: none !important;
+    }
+
+    .map-button {
+      background: #2a6f4e;
+    }
+
+    .tide-state {
+      margin: 0;
+      padding: 10px;
+      border-radius: 8px;
+      background: #ffd166;
+      color: #16232a;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .tide-state.unknown {
+      background: #53636b;
+      color: white;
+    }
+
+    .tide-times {
+      margin: 7px 0 0;
+      color: #c6d7de;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .map-frame {
+      position: relative;
+      width: 100%;
+      margin-top: 11px;
+      overflow: hidden;
+      border: 1px solid #376071;
+      border-radius: 10px;
+      background: #102633;
+      line-height: 0;
+    }
+
+    .map-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .boat-marker {
+      position: absolute;
+      width: 34px;
+      height: 34px;
+      margin: -17px 0 0 -17px;
+      pointer-events: none;
+    }
+
+    .boat-marker svg {
+      width: 100%;
+      height: 100%;
+      transform-origin: 50% 50%;
+    }
+
+    #mapStatus {
+      margin: 7px 0 0;
+      color: #d6e3e8;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    @media (max-width: 380px) {
+      .vmg-value {
+        font-size: 32px;
+      }
+
+      .data-value {
+        font-size: 16px;
+      }
+
+      .rounding-side {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ================= RACE VIEW ================= -->
+
+  <div id="raceView">
+    <h1>Race VMG</h1>
+
+    <p class="subtitle">
+      Progress toward the selected mark
+    </p>
+
+    <label for="courseSelect">
+      Course
+    </label>
+
+    <select id="courseSelect">
+      <option value="">Choose a course</option>
+    </select>
+
+    <label for="markSelect">
+      Active mark
+    </label>
+
+    <select id="markSelect" disabled>
+      <option value="">Select a course first</option>
+    </select>
+
+    <section class="panel">
+      <p class="mark-name" id="markName">
+        No mark selected
+      </p>
+
+      <p class="rounding-side" id="roundingSide"></p>
+
+      <p class="course-note" id="courseNote"></p>
+    </section>
+
+    <div class="button-row">
+      <button id="startButton" type="button">
+        Start GPS
+      </button>
+
+      <button id="stopButton" type="button" disabled>
+        Stop GPS
+      </button>
+    </div>
+
+    <button
+      id="mapButton"
+      class="map-button"
+      type="button"
+    >
+      Tide map
+    </button>
+
+    <section class="panel">
+      <div class="vmg-grid">
+        <div class="vmg-box">
+          <div class="vmg-label">
+            INSTANT VMG
+          </div>
+
+          <div class="vmg-value" id="instantVmgDisplay">
+            --
+          </div>
+
+          <div class="vmg-unit">
+            knots
+          </div>
+        </div>
+
+        <div class="vmg-box">
+          <div class="vmg-label">
+            15 SECOND VMG
+          </div>
+
+          <div class="vmg-value" id="rollingVmgDisplay">
+            --
+          </div>
+
+          <div class="vmg-unit">
+            knots
+          </div>
+        </div>
+      </div>
+
+      <p id="vmgMessage">
+        Select a mark and start GPS
+      </p>
+
+      <p id="sampleStatus">
+        No VMG samples
+      </p>
+    </section>
+
+    <section class="panel">
+      <div class="data-grid">
+        <div class="data-item">
+          <span class="data-label">SOG</span>
+          <span class="data-value" id="speedDisplay">--</span>
+        </div>
+
+        <div class="data-item">
+          <span class="data-label">COG</span>
+          <span class="data-value" id="courseDisplay">--</span>
+        </div>
+
+        <div class="data-item">
+          <span class="data-label">Bearing</span>
+          <span class="data-value" id="bearingDisplay">--</span>
+        </div>
+
+        <div class="data-item">
+          <span class="data-label">Distance</span>
+          <span class="data-value" id="distanceDisplay">--</span>
+        </div>
+
+        <div class="data-item">
+          <span class="data-label">Course offset</span>
+          <span class="data-value" id="offsetDisplay">--</span>
+        </div>
+
+        <div class="data-item">
+          <span class="data-label">GPS</span>
+          <span class="data-value" id="gpsStatus">Stopped</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================= MAP VIEW ================= -->
+
+  <div id="mapView" class="hidden">
+    <p class="tide-state unknown" id="tideState">
+      Loading tide data
+    </p>
+
+    <p class="tide-times" id="tideTimes"></p>
+
+    <div class="map-frame" id="mapFrame">
+      <img
+        id="tideImage"
+        src="tide-incoming.jpg"
+        alt="Tidal stream map"
+      >
+
+      <div class="boat-marker hidden" id="boatMarker">
+        <svg viewBox="0 0 34 34" id="boatArrow">
+          <circle
+            cx="17" cy="17" r="7"
+            fill="#ff00ff"
+            stroke="white"
+            stroke-width="2.5"
+          />
+          <polygon
+            id="cogArrow"
+            points="17,0 22,9 12,9"
+            fill="#ff00ff"
+            stroke="white"
+            stroke-width="1.5"
+          />
+        </svg>
+      </div>
+    </div>
+
+    <p id="mapStatus">
+      Start GPS to show the boat
+    </p>
+
+    <button id="backButton" type="button">
+      Back
+    </button>
+  </div>
+
+  <script src="courses.js"></script>
+  <script src="tides.js"></script>
+
+  <script>
+    const courseSelect =
+      document.getElementById("courseSelect");
+
+    const markSelect =
+      document.getElementById("markSelect");
+
+    const markName =
+      document.getElementById("markName");
+
+    const roundingSide =
+      document.getElementById("roundingSide");
+
+    const courseNote =
+      document.getElementById("courseNote");
+
+    const startButton =
+      document.getElementById("startButton");
+
+    const stopButton =
+      document.getElementById("stopButton");
+
+    const instantVmgDisplay =
+      document.getElementById("instantVmgDisplay");
+
+    const rollingVmgDisplay =
+      document.getElementById("rollingVmgDisplay");
+
+    const vmgMessage =
+      document.getElementById("vmgMessage");
+
+    const sampleStatus =
+      document.getElementById("sampleStatus");
+
+    const speedDisplay =
+      document.getElementById("speedDisplay");
+
+    const courseDisplay =
+      document.getElementById("courseDisplay");
+
+    const bearingDisplay =
+      document.getElementById("bearingDisplay");
+
+    const distanceDisplay =
+      document.getElementById("distanceDisplay");
+
+    const offsetDisplay =
+      document.getElementById("offsetDisplay");
+
+    const gpsStatus =
+      document.getElementById("gpsStatus");
+
+    let gpsWatchId = null;
+    let lastGpsPosition = null;
+    let distanceHistory = [];
+
+    const rollingWindowSeconds = 15;
+
+
+    function getSelectedCourse() {
+      const selectedCourseId =
+        Number(courseSelect.value);
+
+      if (!selectedCourseId) {
+        return null;
+      }
+
+      return courses.find(function(course) {
+        return course.id === selectedCourseId;
+      }) || null;
+    }
+
+
+    function getSelectedWaypoint() {
+      const selectedCourse =
+        getSelectedCourse();
+
+      if (
+        !selectedCourse ||
+        markSelect.value === ""
+      ) {
+        return null;
+      }
+
+      const waypointIndex =
+        Number(markSelect.value);
+
+      if (
+        !Number.isInteger(waypointIndex) ||
+        waypointIndex < 0 ||
+        waypointIndex >= selectedCourse.marks.length
+      ) {
+        return null;
+      }
+
+      return selectedCourse.marks[waypointIndex];
+    }
+
+
+    function loadCourses() {
+      courses.forEach(function(course) {
+        const option =
+          document.createElement("option");
+
+        option.value = course.id;
+
+        option.textContent =
+          course.name +
+          " (" +
+          course.distanceNm +
+          " NM)";
+
+        courseSelect.appendChild(option);
+      });
+    }
+
+
+    function loadMarksForSelectedCourse() {
+      const selectedCourse =
+        getSelectedCourse();
+
+      markSelect.innerHTML = "";
+
+      resetNavigationDisplay();
+
+      if (!selectedCourse) {
+        const option =
+          document.createElement("option");
+
+        option.value = "";
+
+        option.textContent =
+          "Select a course first";
+
+        markSelect.appendChild(option);
+        markSelect.disabled = true;
+
+        return;
+      }
+
+      markSelect.disabled = false;
+
+      const instruction =
+        document.createElement("option");
+
+      instruction.value = "";
+
+      instruction.textContent =
+        "Choose the active mark";
+
+      markSelect.appendChild(instruction);
+
+      selectedCourse.marks.forEach(
+        function(waypoint, index) {
+          const mark =
+            marks[waypoint.id];
+
+          if (!mark) {
+            return;
+          }
+
+          const option =
+            document.createElement("option");
+
+          /*
+            Use the waypoint index as the value.
+            The same physical mark can appear more
+            than once with a different rounding side.
+          */
+          option.value = index;
+
+          option.textContent =
+            (index + 1) +
+            ". " +
+            mark.name +
+            " - " +
+            waypoint.side.toUpperCase();
+
+          markSelect.appendChild(option);
+        }
+      );
+
+      if (selectedCourse.note) {
+        courseNote.textContent =
+          selectedCourse.note;
+
+        courseNote.style.display =
+          "block";
+      }
+    }
+
+
+    function displaySelectedMark() {
+      distanceHistory = [];
+
+      const waypoint =
+        getSelectedWaypoint();
+
+      if (
+        !waypoint ||
+        !marks[waypoint.id]
+      ) {
+        resetNavigationDisplay();
+        return;
+      }
+
+      markName.textContent =
+        marks[waypoint.id].name;
+
+      roundingSide.textContent =
+        "LEAVE TO " +
+        waypoint.side.toUpperCase();
+
+      roundingSide.style.display =
+        "block";
+
+      const selectedCourse =
+        getSelectedCourse();
+
+      if (
+        selectedCourse &&
+        selectedCourse.note
+      ) {
+        courseNote.textContent =
+          selectedCourse.note;
+
+        courseNote.style.display =
+          "block";
+      } else {
+        courseNote.textContent = "";
+        courseNote.style.display =
+          "none";
+      }
+
+      instantVmgDisplay.textContent = "--";
+      rollingVmgDisplay.textContent = "--";
+
+      sampleStatus.textContent =
+        "Collecting a new 15 second sample";
+
+      if (lastGpsPosition) {
+        updateNavigation(
+          lastGpsPosition,
+          null
+        );
+      } else {
+        vmgMessage.textContent =
+          "Start GPS to calculate VMG";
+      }
+    }
+
+
+    function resetNavigationDisplay() {
+      markName.textContent =
+        "No mark selected";
+
+      roundingSide.textContent = "";
+      roundingSide.style.display =
+        "none";
+
+      courseNote.textContent = "";
+      courseNote.style.display =
+        "none";
+
+      instantVmgDisplay.textContent = "--";
+      rollingVmgDisplay.textContent = "--";
+
+      speedDisplay.textContent = "--";
+      courseDisplay.textContent = "--";
+      bearingDisplay.textContent = "--";
+      distanceDisplay.textContent = "--";
+      offsetDisplay.textContent = "--";
+
+      instantVmgDisplay.className =
+        "vmg-value";
+
+      rollingVmgDisplay.className =
+        "vmg-value";
+
+      vmgMessage.textContent =
+        "Select a mark and start GPS";
+
+      sampleStatus.textContent =
+        "No VMG samples";
+
+      distanceHistory = [];
+    }
+
+
+    function degreesToRadians(degrees) {
+      return degrees * Math.PI / 180;
+    }
+
+
+    function radiansToDegrees(radians) {
+      return radians * 180 / Math.PI;
+    }
+
+
+    function calculateDistanceNm(
+      latitude1,
+      longitude1,
+      latitude2,
+      longitude2
+    ) {
+      const earthRadiusNm = 3440.065;
+
+      const latitudeDifference =
+        degreesToRadians(
+          latitude2 - latitude1
+        );
+
+      const longitudeDifference =
+        degreesToRadians(
+          longitude2 - longitude1
+        );
+
+      const latitude1Radians =
+        degreesToRadians(latitude1);
+
+      const latitude2Radians =
+        degreesToRadians(latitude2);
+
+      const a =
+        Math.sin(
+          latitudeDifference / 2
+        ) ** 2 +
+        Math.cos(latitude1Radians) *
+        Math.cos(latitude2Radians) *
+        Math.sin(
+          longitudeDifference / 2
+        ) ** 2;
+
+      const angularDistance =
+        2 *
+        Math.atan2(
+          Math.sqrt(a),
+          Math.sqrt(1 - a)
+        );
+
+      return earthRadiusNm * angularDistance;
+    }
+
+
+    function calculateBearing(
+      latitude1,
+      longitude1,
+      latitude2,
+      longitude2
+    ) {
+      const latitude1Radians =
+        degreesToRadians(latitude1);
+
+      const latitude2Radians =
+        degreesToRadians(latitude2);
+
+      const longitudeDifference =
+        degreesToRadians(
+          longitude2 - longitude1
+        );
+
+      const y =
+        Math.sin(longitudeDifference) *
+        Math.cos(latitude2Radians);
+
+      const x =
+        Math.cos(latitude1Radians) *
+        Math.sin(latitude2Radians) -
+        Math.sin(latitude1Radians) *
+        Math.cos(latitude2Radians) *
+        Math.cos(longitudeDifference);
+
+      const bearing =
+        radiansToDegrees(
+          Math.atan2(y, x)
+        );
+
+      return (bearing + 360) % 360;
+    }
+
+
+    function calculateAngleDifference(
+      course,
+      bearing
+    ) {
+      return (
+        (course - bearing + 540) %
+        360
+      ) - 180;
+    }
+
+
+    function deriveMovement(
+      previousPosition,
+      currentPosition
+    ) {
+      if (!previousPosition) {
+        return null;
+      }
+
+      const elapsedSeconds =
+        (
+          currentPosition.timestamp -
+          previousPosition.timestamp
+        ) / 1000;
+
+      if (
+        elapsedSeconds <= 0 ||
+        elapsedSeconds > 30
+      ) {
+        return null;
+      }
+
+      const previous =
+        previousPosition.coords;
+
+      const current =
+        currentPosition.coords;
+
+      const distanceNm =
+        calculateDistanceNm(
+          previous.latitude,
+          previous.longitude,
+          current.latitude,
+          current.longitude
+        );
+
+      const speedKnots =
+        distanceNm /
+        (elapsedSeconds / 3600);
+
+      if (
+        distanceNm < 0.001 ||
+        speedKnots > 40
+      ) {
+        return null;
+      }
+
+      return {
+        speedKnots: speedKnots,
+
+        course: calculateBearing(
+          previous.latitude,
+          previous.longitude,
+          current.latitude,
+          current.longitude
+        )
+      };
+    }
+
+
+    function getMovement(position) {
+      const coordinates =
+        position.coords;
+
+      if (
+        coordinates.speed !== null &&
+        coordinates.speed >= 0 &&
+        coordinates.heading !== null &&
+        !Number.isNaN(coordinates.heading)
+      ) {
+        return {
+          speedKnots:
+            coordinates.speed * 1.943844,
+
+          course:
+            coordinates.heading
+        };
+      }
+
+      return deriveMovement(
+        lastGpsPosition,
+        position
+      );
+    }
+
+
+    function updateRollingVmg(
+      timestamp,
+      distance
+    ) {
+      distanceHistory.push({
+        timestamp: timestamp,
+        distance: distance
+      });
+
+      const oldestAllowedTime =
+        timestamp -
+        (rollingWindowSeconds * 1000);
+
+      /*
+        Keep one sample just before the 15-second
+        boundary and all later samples.
+      */
+      while (
+        distanceHistory.length > 2 &&
+        distanceHistory[1].timestamp <
+          oldestAllowedTime
+      ) {
+        distanceHistory.shift();
+      }
+
+      const oldestSample =
+        distanceHistory[0];
+
+      const newestSample =
+        distanceHistory[
+          distanceHistory.length - 1
+        ];
+
+      const elapsedSeconds =
+        (
+          newestSample.timestamp -
+          oldestSample.timestamp
+        ) / 1000;
+
+      if (elapsedSeconds < 12) {
+        const remaining =
+          Math.ceil(
+            rollingWindowSeconds -
+            elapsedSeconds
+          );
+
+        rollingVmgDisplay.textContent =
+          "--";
+
+        sampleStatus.textContent =
+          "15 second VMG ready in about " +
+          remaining +
+          " seconds";
+
+        return null;
+      }
+
+      const changeInDistance =
+        oldestSample.distance -
+        newestSample.distance;
+
+      const rollingVmg =
+        changeInDistance /
+        (elapsedSeconds / 3600);
+
+      rollingVmgDisplay.textContent =
+        rollingVmg.toFixed(2);
+
+      setVmgColour(
+        rollingVmgDisplay,
+        rollingVmg
+      );
+
+      sampleStatus.textContent =
+        "Rolling window: " +
+        elapsedSeconds.toFixed(0) +
+        " seconds";
+
+      return rollingVmg;
+    }
+
+
+    function setVmgColour(
+      element,
+      value
+    ) {
+      element.className =
+        "vmg-value " +
+        (
+          value >= 0
+            ? "positive"
+            : "negative"
+        );
+    }
+
+
+    function updateNavigation(
+      position,
+      movement
+    ) {
+      const waypoint =
+        getSelectedWaypoint();
+
+      if (
+        !waypoint ||
+        !marks[waypoint.id]
+      ) {
+        vmgMessage.textContent =
+          "Select an active mark";
+
+        return;
+      }
+
+      const selectedMark =
+        marks[waypoint.id];
+
+      const coordinates =
+        position.coords;
+
+      const bearing =
+        calculateBearing(
+          coordinates.latitude,
+          coordinates.longitude,
+          selectedMark.latitude,
+          selectedMark.longitude
+        );
+
+      const distance =
+        calculateDistanceNm(
+          coordinates.latitude,
+          coordinates.longitude,
+          selectedMark.latitude,
+          selectedMark.longitude
+        );
+
+      bearingDisplay.textContent =
+        bearing.toFixed(0) + "°";
+
+      distanceDisplay.textContent =
+        distance < 1
+          ? distance.toFixed(3) + " NM"
+          : distance.toFixed(2) + " NM";
+
+      updateRollingVmg(
+        position.timestamp,
+        distance
+      );
+
+      if (!movement) {
+        instantVmgDisplay.textContent =
+          "--";
+
+        offsetDisplay.textContent =
+          "Waiting";
+
+        vmgMessage.textContent =
+          "Move to calculate instant VMG";
+
+        return;
+      }
+
+      speedDisplay.textContent =
+        movement.speedKnots.toFixed(2) +
+        " kn";
+
+      courseDisplay.textContent =
+        movement.course.toFixed(0) +
+        "°";
+
+      const angleDifference =
+        calculateAngleDifference(
+          movement.course,
+          bearing
+        );
+
+      const instantVmg =
+        movement.speedKnots *
+        Math.cos(
+          degreesToRadians(
+            angleDifference
+          )
+        );
+
+      instantVmgDisplay.textContent =
+        instantVmg.toFixed(2);
+
+      setVmgColour(
+        instantVmgDisplay,
+        instantVmg
+      );
+
+      let side = "on bearing";
+
+      if (Math.abs(angleDifference) >= 1) {
+        side =
+          angleDifference < 0
+            ? "port"
+            : "starboard";
+      }
+
+      offsetDisplay.textContent =
+        Math.abs(
+          angleDifference
+        ).toFixed(0) +
+        "° " +
+        side;
+
+      vmgMessage.textContent =
+        instantVmg >= 0
+          ? "Closing on the selected mark"
+          : "Moving away from the selected mark";
+    }
+
+
+    function startGps() {
+      if (!navigator.geolocation) {
+        gpsStatus.textContent =
+          "Not supported";
+
+        gpsStatus.className =
+          "data-value warning";
+
+        return;
+      }
+
+      if (gpsWatchId !== null) {
+        return;
+      }
+
+      gpsStatus.textContent =
+        "Starting...";
+
+      startButton.disabled = true;
+      stopButton.disabled = false;
+
+      distanceHistory = [];
+      lastGpsPosition = null;
+
+      gpsWatchId =
+        navigator.geolocation.watchPosition(
+          handleGpsPosition,
+          handleGpsError,
+          {
+            enableHighAccuracy: true,
+            maximumAge: 1000,
+            timeout: 15000
+          }
+        );
+    }
+
+
+    function handleGpsPosition(position) {
+      const movement =
+        getMovement(position);
+
+      if (movement) {
+        speedDisplay.textContent =
+          movement.speedKnots.toFixed(2) +
+          " kn";
+
+        courseDisplay.textContent =
+          movement.course.toFixed(0) +
+          "°";
+
+        lastMovement = movement;
+      } else {
+        speedDisplay.textContent =
+          "Waiting";
+
+        courseDisplay.textContent =
+          "Waiting";
+      }
+
+      gpsStatus.textContent =
+        "Active";
+
+      gpsStatus.className =
+        "data-value positive";
+
+      updateNavigation(
+        position,
+        movement
+      );
+
+      lastGpsPosition = position;
+
+      updateBoatOnMap();
+    }
+
+
+    function handleGpsError(error) {
+      let message = "GPS error";
+
+      if (error.code === 1) {
+        message = "Permission denied";
+      }
+
+      if (error.code === 2) {
+        message = "Unavailable";
+      }
+
+      if (error.code === 3) {
+        message = "Timed out";
+      }
+
+      gpsStatus.textContent = message;
+
+      gpsStatus.className =
+        "data-value warning";
+
+      startButton.disabled = false;
+      stopButton.disabled = true;
+
+      gpsWatchId = null;
+    }
+
+
+    function stopGps() {
+      if (gpsWatchId !== null) {
+        navigator.geolocation.clearWatch(
+          gpsWatchId
+        );
+      }
+
+      gpsWatchId = null;
+      lastGpsPosition = null;
+      lastMovement = null;
+      distanceHistory = [];
+
+      gpsStatus.textContent = "Stopped";
+      gpsStatus.className = "data-value";
+
+      startButton.disabled = false;
+      stopButton.disabled = true;
+
+      sampleStatus.textContent =
+        "No VMG samples";
+
+      updateBoatOnMap();
+    }
+
+
+    /* =====================================================
+       TIDE MAP
+       ===================================================== */
+
+    const raceView =
+      document.getElementById("raceView");
+
+    const mapView =
+      document.getElementById("mapView");
+
+    const mapButton =
+      document.getElementById("mapButton");
+
+    const backButton =
+      document.getElementById("backButton");
+
+    const tideState =
+      document.getElementById("tideState");
+
+    const tideTimes =
+      document.getElementById("tideTimes");
+
+    const tideImage =
+      document.getElementById("tideImage");
+
+    const boatMarker =
+      document.getElementById("boatMarker");
+
+    const boatArrow =
+      document.getElementById("boatArrow");
+
+    const cogArrow =
+      document.getElementById("cogArrow");
+
+    const mapStatus =
+      document.getElementById("mapStatus");
+
+    let lastMovement = null;
+    let tideEvents = [];
+    let tideDataLoaded = false;
+
+    const tideImages = {
+      incoming: "tide-incoming.jpg",
+      outgoing: "tide-outgoing.jpg"
+    };
+
+    /*
+      Image calibration (both images share the same framing).
+      Image size: 2048 x 1154 pixels, north up.
+
+      Reference point: Bean Rock Light at pixel (860, 1027).
+      Scale: 12017 pixels per degree of longitude,
+             15016 pixels per degree of latitude.
+
+      Checked against Browns Island light (within 2 px) and
+      Rangitoto summit (within about 25 px, roughly 200 m).
+      Intended for tide awareness, not navigation.
+    */
+    const mapCalibration = {
+      imageWidth: 2048,
+      imageHeight: 1154,
+      referenceLatitude: -36.8332983,
+      referenceLongitude: 174.8311950,
+      referenceX: 860,
+      referenceY: 1027,
+      pixelsPerDegreeLongitude: 12017,
+      pixelsPerDegreeLatitude: 15016
+    };
+
+
+    function latLonToImagePixel(latitude, longitude) {
+      const c = mapCalibration;
+
+      return {
+        x:
+          c.referenceX +
+          (longitude - c.referenceLongitude) *
+          c.pixelsPerDegreeLongitude,
+
+        y:
+          c.referenceY -
+          (latitude - c.referenceLatitude) *
+          c.pixelsPerDegreeLatitude
+      };
+    }
+
+
+    function formatTime(date) {
+      return (
+        String(date.getHours()).padStart(2, "0") +
+        ":" +
+        String(date.getMinutes()).padStart(2, "0")
+      );
+    }
+
+
+    function updateTideDisplay() {
+      if (!tideDataLoaded) {
+        tideState.textContent =
+          "Loading tide data";
+
+        tideState.className =
+          "tide-state unknown";
+
+        return;
+      }
+
+      const status =
+        getTideStatus(tideEvents, new Date());
+
+      tideState.textContent =
+        status.label;
+
+      tideState.className =
+        status.state === "unknown"
+          ? "tide-state unknown"
+          : "tide-state";
+
+      if (status.image) {
+        const wanted =
+          tideImages[status.image];
+
+        if (tideImage.getAttribute("src") !== wanted) {
+          tideImage.setAttribute("src", wanted);
+        }
+
+        tideImage.classList.remove("hidden");
+      } else {
+        tideImage.classList.add("hidden");
+      }
+
+      if (status.next && status.next.type) {
+        tideTimes.textContent =
+          "Next " +
+          (status.next.type === "high" ? "high" : "low") +
+          " water " +
+          formatTime(status.next.time) +
+          " (" +
+          status.next.height.toFixed(1) +
+          " m), Auckland";
+      } else {
+        tideTimes.textContent = "";
+      }
+    }
+
+
+    function updateBoatOnMap() {
+      if (!lastGpsPosition) {
+        boatMarker.classList.add("hidden");
+
+        mapStatus.textContent =
+          gpsWatchId === null
+            ? "Start GPS to show the boat"
+            : "Waiting for GPS position";
+
+        return;
+      }
+
+      const coordinates =
+        lastGpsPosition.coords;
+
+      const pixel =
+        latLonToImagePixel(
+          coordinates.latitude,
+          coordinates.longitude
+        );
+
+      const c = mapCalibration;
+
+      if (
+        pixel.x < 0 ||
+        pixel.y < 0 ||
+        pixel.x > c.imageWidth ||
+        pixel.y > c.imageHeight
+      ) {
+        boatMarker.classList.add("hidden");
+
+        mapStatus.textContent =
+          "Boat is outside the tide map";
+
+        return;
+      }
+
+      boatMarker.style.left =
+        (pixel.x / c.imageWidth * 100) + "%";
+
+      boatMarker.style.top =
+        (pixel.y / c.imageHeight * 100) + "%";
+
+      if (lastMovement) {
+        cogArrow.style.display = "";
+
+        boatArrow.style.transform =
+          "rotate(" +
+          lastMovement.course.toFixed(0) +
+          "deg)";
+
+        mapStatus.textContent =
+          "SOG " +
+          lastMovement.speedKnots.toFixed(1) +
+          " kn, COG " +
+          lastMovement.course.toFixed(0) +
+          "°";
+      } else {
+        cogArrow.style.display = "none";
+        boatArrow.style.transform = "";
+
+        mapStatus.textContent =
+          "Boat position shown";
+      }
+
+      boatMarker.classList.remove("hidden");
+    }
+
+
+    function showMapView() {
+      raceView.classList.add("hidden");
+      mapView.classList.remove("hidden");
+
+      updateTideDisplay();
+      updateBoatOnMap();
+
+      window.scrollTo(0, 0);
+    }
+
+
+    function showRaceView() {
+      mapView.classList.add("hidden");
+      raceView.classList.remove("hidden");
+
+      window.scrollTo(0, 0);
+    }
+
+
+    loadTideEvents().then(function(events) {
+      tideEvents = events;
+      tideDataLoaded = true;
+      updateTideDisplay();
+    });
+
+    /* Re-check the tide state every minute */
+    setInterval(updateTideDisplay, 60000);
+
+
+    courseSelect.addEventListener(
+      "change",
+      loadMarksForSelectedCourse
+    );
+
+    markSelect.addEventListener(
+      "change",
+      displaySelectedMark
+    );
+
+    startButton.addEventListener(
+      "click",
+      startGps
+    );
+
+    stopButton.addEventListener(
+      "click",
+      stopGps
+    );
+
+    mapButton.addEventListener(
+      "click",
+      showMapView
+    );
+
+    backButton.addEventListener(
+      "click",
+      showRaceView
+    );
+
+    loadCourses();
+  </script>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener(
+        "load",
+        function() {
+          navigator.serviceWorker
+            .register("./sw.js")
+            .then(function() {
+              console.log(
+                "Race VMG Tide offline mode ready"
+              );
+            })
+            .catch(function(error) {
+              console.error(
+                "Offline mode could not start:",
+                error
+              );
+            });
+        }
+      );
+    }
+  </script>
+</body>
+</html>
